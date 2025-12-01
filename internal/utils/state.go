@@ -1,11 +1,11 @@
-package state
+package utils
 
 import (
 	"sync"
 )
 
 type UserState struct {
-	Step     string // "select_options", "enter_email", "done"
+	Step     string
 	Selected map[string]bool
 	Email    string
 }

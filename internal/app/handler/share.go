@@ -6,13 +6,38 @@ import (
 	"strings"
 
 	"go-tele-bot/internal/data"
-	"go-tele-bot/internal/state"
+	"go-tele-bot/internal/utils"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 )
 
-var shareState = state.NewManager()
+// Callback data prefixes
+const (
+	callbackShareOptPrefix = "share_opt_"
+	callbackShareDone      = "share_done"
+	callbackShareCancel    = "share_cancel"
+)
+
+// State steps
+const (
+	stepSelectOptions = "select_options"
+	stepEnterEmail    = "enter_email"
+	stepDone          = "done"
+)
+
+var shareState = utils.NewManager()
+
+// shareCallbackContext holds common data for share callback handlers
+type shareCallbackContext struct {
+	ctx         context.Context
+	b           *bot.Bot
+	callbackID  string
+	userID      int64
+	chatID      int64
+	messageID   int
+	state       *utils.UserState
+}
 
 // ShareCommandHandler handles the /share command
 func ShareCommandHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
@@ -24,19 +49,21 @@ func ShareCommandHandler(ctx context.Context, b *bot.Bot, update *models.Update)
 	chatID := update.Message.Chat.ID
 
 	// Initialize state for this user
-	shareState.Set(userID, &state.UserState{
-		Step:     "select_options",
+	state := &utils.UserState{
+		Step:     stepSelectOptions,
 		Selected: make(map[string]bool),
-	})
+	}
+	shareState.Set(userID, state)
 
 	// Send options keyboard
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:      chatID,
 		Text:        "📤 <b>Share</b>\n\nSelect what you want to share (tap to toggle):",
 		ParseMode:   models.ParseModeHTML,
-		ReplyMarkup: buildOptionsKeyboard(make(map[string]bool)),
+		ReplyMarkup: utils.BuildSelectKeyboard(make(map[string]bool), callbackShareOptPrefix, callbackShareDone, callbackShareCancel),
 	})
 }
+
 
 // ShareCallbackHandler handles button clicks
 func ShareCallbackHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
@@ -45,12 +72,8 @@ func ShareCallbackHandler(ctx context.Context, b *bot.Bot, update *models.Update
 	}
 
 	userID := update.CallbackQuery.From.ID
-	chatID := update.CallbackQuery.Message.Message.Chat.ID
-	messageID := update.CallbackQuery.Message.Message.ID
-	data := update.CallbackQuery.Data
-
 	state := shareState.Get(userID)
-	if state == nil || state.Step != "select_options" {
+	if state == nil || state.Step != stepSelectOptions {
 		b.AnswerCallbackQuery(ctx, &bot.AnswerCallbackQueryParams{
 			CallbackQueryID: update.CallbackQuery.ID,
 			Text:            "Please start with /share",
@@ -58,70 +81,24 @@ func ShareCallbackHandler(ctx context.Context, b *bot.Bot, update *models.Update
 		return
 	}
 
-	// Handle "Done" button
-	if data == "share_done" {
-		if len(state.Selected) == 0 {
-			b.AnswerCallbackQuery(ctx, &bot.AnswerCallbackQueryParams{
-				CallbackQueryID: update.CallbackQuery.ID,
-				Text:            "Please select at least one option!",
-				ShowAlert:       true,
-			})
-			return
-		}
-
-		// Move to email step
-		state.Step = "enter_email"
-		shareState.Set(userID, state)
-
-		b.AnswerCallbackQuery(ctx, &bot.AnswerCallbackQueryParams{
-			CallbackQueryID: update.CallbackQuery.ID,
-		})
-
-		b.EditMessageText(ctx, &bot.EditMessageTextParams{
-			ChatID:    chatID,
-			MessageID: messageID,
-			Text:      "✅ Options selected!\n\n📧 Now please enter your email address:",
-		})
-		return
+	cc := &shareCallbackContext{
+		ctx:        ctx,
+		b:          b,
+		callbackID: update.CallbackQuery.ID,
+		userID:     userID,
+		chatID:     update.CallbackQuery.Message.Message.Chat.ID,
+		messageID:  update.CallbackQuery.Message.Message.ID,
+		state:      state,
 	}
 
-	// Handle "Cancel" button
-	if data == "share_cancel" {
-		shareState.Delete(userID)
-
-		b.AnswerCallbackQuery(ctx, &bot.AnswerCallbackQueryParams{
-			CallbackQueryID: update.CallbackQuery.ID,
-			Text:            "Cancelled",
-		})
-
-		b.EditMessageText(ctx, &bot.EditMessageTextParams{
-			ChatID:    chatID,
-			MessageID: messageID,
-			Text:      "❌ Share cancelled.",
-		})
-		return
-	}
-
-	// Toggle option selection
-	if strings.HasPrefix(data, "share_opt_") {
-		option := strings.TrimPrefix(data, "share_opt_")
-		
-		if state.Selected[option] {
-			delete(state.Selected, option)
-		} else {
-			state.Selected[option] = true
-		}
-		shareState.Set(userID, state)
-
-		b.AnswerCallbackQuery(ctx, &bot.AnswerCallbackQueryParams{
-			CallbackQueryID: update.CallbackQuery.ID,
-		})
-
-		b.EditMessageReplyMarkup(ctx, &bot.EditMessageReplyMarkupParams{
-			ChatID:      chatID,
-			MessageID:   messageID,
-			ReplyMarkup: buildOptionsKeyboard(state.Selected),
-		})
+	data := update.CallbackQuery.Data
+	switch {
+	case data == callbackShareDone:
+		handleShareDone(cc)
+	case data == callbackShareCancel:
+		handleShareCancel(cc)
+	case strings.HasPrefix(data, callbackShareOptPrefix):
+		handleShareOptionToggle(cc, strings.TrimPrefix(data, callbackShareOptPrefix))
 	}
 }
 
@@ -135,13 +112,17 @@ func ShareEmailHandler(ctx context.Context, b *bot.Bot, update *models.Update) b
 	chatID := update.Message.Chat.ID
 
 	state := shareState.Get(userID)
-	if state == nil || state.Step != "enter_email" {
+	if state == nil || state.Step != stepEnterEmail {
 		return false
 	}
 
 	email := update.Message.Text
 	state.Email = email
-	state.Step = "done"
+	state.Step = stepDone
+	
+	// TODO: share the selected items to the email
+
+	// TODO: send email to the user
 
 	// Build summary
 	var selectedItems []string
@@ -172,31 +153,65 @@ func ShareEmailHandler(ctx context.Context, b *bot.Bot, update *models.Update) b
 	return true
 }
 
-// buildOptionsKeyboard creates the inline keyboard for option selection
-func buildOptionsKeyboard(selected map[string]bool) *models.InlineKeyboardMarkup {
-	var rows [][]models.InlineKeyboardButton
+// Helper functions
 
-	for _, option := range data.GetFolderNames() {
-		label := option
-		if selected[option] {
-			label = "✅ " + option
-		} else {
-			label = "⬜ " + option
-		}
-
-		rows = append(rows, []models.InlineKeyboardButton{
-			{Text: label, CallbackData: "share_opt_" + option},
+// handleShareDone handles the "Done" button click
+func handleShareDone(cc *shareCallbackContext) {
+	if len(cc.state.Selected) == 0 {
+		cc.b.AnswerCallbackQuery(cc.ctx, &bot.AnswerCallbackQueryParams{
+			CallbackQueryID: cc.callbackID,
+			Text:            "Please select at least one option!",
+			ShowAlert:       true,
 		})
+		return
 	}
 
-	// Add Done and Cancel buttons
-	rows = append(rows, []models.InlineKeyboardButton{
-		{Text: "✓ Done", CallbackData: "share_done"},
-		{Text: "✗ Cancel", CallbackData: "share_cancel"},
+	cc.state.Step = stepEnterEmail
+	shareState.Set(cc.userID, cc.state)
+
+	go cc.b.AnswerCallbackQuery(cc.ctx, &bot.AnswerCallbackQueryParams{
+		CallbackQueryID: cc.callbackID,
 	})
 
-	return &models.InlineKeyboardMarkup{
-		InlineKeyboard: rows,
-	}
+	cc.b.EditMessageText(cc.ctx, &bot.EditMessageTextParams{
+		ChatID:    cc.chatID,
+		MessageID: cc.messageID,
+		Text:      "✅ Options selected!\n\n📧 Now please enter your email address:",
+	})
 }
 
+// handleShareCancel handles the "Cancel" button click
+func handleShareCancel(cc *shareCallbackContext) {
+	shareState.Delete(cc.userID)
+
+	go cc.b.AnswerCallbackQuery(cc.ctx, &bot.AnswerCallbackQueryParams{
+		CallbackQueryID: cc.callbackID,
+		Text:            "Cancelled",
+	})
+
+	cc.b.EditMessageText(cc.ctx, &bot.EditMessageTextParams{
+		ChatID:    cc.chatID,
+		MessageID: cc.messageID,
+		Text:      "❌ Share cancelled.",
+	})
+}
+
+// handleShareOptionToggle handles the option toggle button click
+func handleShareOptionToggle(cc *shareCallbackContext, option string) {
+	if cc.state.Selected[option] {
+		delete(cc.state.Selected, option)
+	} else {
+		cc.state.Selected[option] = true
+	}
+	shareState.Set(cc.userID, cc.state)
+
+	go cc.b.AnswerCallbackQuery(cc.ctx, &bot.AnswerCallbackQueryParams{
+		CallbackQueryID: cc.callbackID,
+	})
+
+	cc.b.EditMessageReplyMarkup(cc.ctx, &bot.EditMessageReplyMarkupParams{
+		ChatID:      cc.chatID,
+		MessageID:   cc.messageID,
+		ReplyMarkup: utils.BuildSelectKeyboard(cc.state.Selected, callbackShareOptPrefix, callbackShareDone, callbackShareCancel),
+	})
+}

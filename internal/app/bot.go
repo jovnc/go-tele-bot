@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 
 	"go-tele-bot/internal/app/handler"
@@ -48,9 +49,9 @@ func (b *TelegramBot) StartWebhook(ctx context.Context) error {
 
 	go func() {
 		addr := ":" + config.GlobalConfig.Port
-		fmt.Printf("Starting webhook server on %s\n", addr)
+		log.Printf("starting webhook server on %s", addr)
 		if err := http.ListenAndServe(addr, b.bot.WebhookHandler()); err != nil {
-			fmt.Printf("HTTP server error: %v\n", err)
+			log.Fatalf("failed to start webhook server: %v", err)
 		}
 	}()
 
