@@ -1,13 +1,17 @@
-.PHONY: build run stop remove
+.PHONY: build start run
+
+APP_NAME=go_api
+BINARY_NAME=go_api
+BUILD_DIR=./build
 
 build:
-	docker build -t go-tele-bot .
+	@echo "Building $(APP_NAME)..."
+	@go build -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/api
+
+start:build
+	@echo "Starting $(APP_NAME)..."
+	@$(BUILD_DIR)/$(BINARY_NAME)
 
 run:
-	docker run -d --name go-tele-bot go-tele-bot
-
-stop:
-	docker stop go-tele-bot
-
-remove:
-	docker rm go-tele-bot
+	@echo "Running $(APP_NAME)..."
+	@go run main.go
