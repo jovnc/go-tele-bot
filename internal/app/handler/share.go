@@ -4,55 +4,15 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"sync"
+
+	"go-tele-bot/internal/data"
+	"go-tele-bot/internal/state"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 )
 
-// Available options for sharing
-var shareOptions = []string{
-	"Documents",
-	"Photos",
-	"Videos",
-	"Music",
-	"Contacts",
-}
-
-// UserState tracks the conversation state for each user
-type UserState struct {
-	Step     string            // "select_options", "enter_email", "done"
-	Selected map[string]bool   // Selected options
-	Email    string
-}
-
-// StateManager manages conversation states for all users
-type StateManager struct {
-	mu     sync.RWMutex
-	states map[int64]*UserState
-}
-
-var shareState = &StateManager{
-	states: make(map[int64]*UserState),
-}
-
-func (sm *StateManager) Get(userID int64) *UserState {
-	sm.mu.RLock()
-	defer sm.mu.RUnlock()
-	return sm.states[userID]
-}
-
-func (sm *StateManager) Set(userID int64, state *UserState) {
-	sm.mu.Lock()
-	defer sm.mu.Unlock()
-	sm.states[userID] = state
-}
-
-func (sm *StateManager) Delete(userID int64) {
-	sm.mu.Lock()
-	defer sm.mu.Unlock()
-	delete(sm.states, userID)
-}
+var shareState = state.NewManager()
 
 // ShareCommandHandler handles the /share command
 func ShareCommandHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
@@ -64,7 +24,7 @@ func ShareCommandHandler(ctx context.Context, b *bot.Bot, update *models.Update)
 	chatID := update.Message.Chat.ID
 
 	// Initialize state for this user
-	shareState.Set(userID, &UserState{
+	shareState.Set(userID, &state.UserState{
 		Step:     "select_options",
 		Selected: make(map[string]bool),
 	})
@@ -185,7 +145,7 @@ func ShareEmailHandler(ctx context.Context, b *bot.Bot, update *models.Update) b
 
 	// Build summary
 	var selectedItems []string
-	for _, opt := range shareOptions {
+	for _, opt := range data.GetFolderNames() {
 		if state.Selected[opt] {
 			selectedItems = append(selectedItems, "• "+opt)
 		}
@@ -209,14 +169,14 @@ func ShareEmailHandler(ctx context.Context, b *bot.Bot, update *models.Update) b
 	// Clean up state
 	shareState.Delete(userID)
 
-	return true // Handled
+	return true
 }
 
 // buildOptionsKeyboard creates the inline keyboard for option selection
 func buildOptionsKeyboard(selected map[string]bool) *models.InlineKeyboardMarkup {
 	var rows [][]models.InlineKeyboardButton
 
-	for _, option := range shareOptions {
+	for _, option := range data.GetFolderNames() {
 		label := option
 		if selected[option] {
 			label = "✅ " + option

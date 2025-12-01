@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
-	"go-tele-bot/internal/app"
-	"go-tele-bot/internal/config"
 	"log"
 	"os"
 	"os/signal"
+
+	"go-tele-bot/internal/app"
+	"go-tele-bot/internal/config"
+	"go-tele-bot/internal/data"
 )
 
 func main() {
@@ -17,6 +19,11 @@ func main() {
 	err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
+	}
+
+	// Load data
+	if err := data.Load(); err != nil {
+		log.Fatalf("Failed to load data: %v", err)
 	}
 
 	// Start the bot
