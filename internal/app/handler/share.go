@@ -30,13 +30,13 @@ var shareState = utils.NewManager()
 
 // shareCallbackContext holds common data for share callback handlers
 type shareCallbackContext struct {
-	ctx         context.Context
-	b           *bot.Bot
-	callbackID  string
-	userID      int64
-	chatID      int64
-	messageID   int
-	state       *utils.UserState
+	ctx        context.Context
+	b          *bot.Bot
+	callbackID string
+	userID     int64
+	chatID     int64
+	messageID  int
+	state      *utils.UserState
 }
 
 // ShareCommandHandler handles the /share command
@@ -63,7 +63,6 @@ func ShareCommandHandler(ctx context.Context, b *bot.Bot, update *models.Update)
 		ReplyMarkup: utils.BuildSelectKeyboard(make(map[string]bool), callbackShareOptPrefix, callbackShareDone, callbackShareCancel),
 	})
 }
-
 
 // ShareCallbackHandler handles button clicks
 func ShareCallbackHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
@@ -119,7 +118,7 @@ func ShareEmailHandler(ctx context.Context, b *bot.Bot, update *models.Update) b
 	email := update.Message.Text
 	state.Email = email
 	state.Step = stepDone
-	
+
 	// TODO: share the selected items to the email
 
 	// TODO: send email to the user

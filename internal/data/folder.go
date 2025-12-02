@@ -41,13 +41,12 @@ func GetFolderNames() []string {
 	return names
 }
 
-// GetFolderByName returns the folder with the given name, or nil if not found
-func GetFolderByName(name string) *Folder {
+// GetFolderIDByName returns the folder ID with the given name
+func GetFolderIDByName(name string) (string, error) {
 	for _, f := range folders {
 		if f.Name == name {
-			return &f
+			return f.ID, nil
 		}
 	}
-	return nil
+	return "", fmt.Errorf("folder %s not found", name)
 }
-
