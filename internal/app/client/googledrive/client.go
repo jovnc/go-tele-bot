@@ -3,6 +3,7 @@ package googledrive
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
@@ -15,7 +16,19 @@ type GoogleDriveClient struct {
 
 // NewGoogleDriveClient creates a new Google Drive client
 func NewGoogleDriveClient(ctx context.Context) (*GoogleDriveClient, error) {
-	client, err := drive.NewService(ctx, option.WithCredentialsFile("credentials.json"))
+	var opts []option.ClientOption
+
+	// Check for credentials JSON content in env var (useful for Cloud Run with Secret Manager)
+	if credsJSON := os.Getenv("GOOGLE_CREDENTIALS_JSON"); credsJSON != "" {
+		opts = append(opts, option.WithCredentialsJSON([]byte(credsJSON)))
+	} else if credsFile := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"); credsFile != "" {
+		opts = append(opts, option.WithCredentialsFile(credsFile))
+	} else {
+		// Fallback to local credentials file for development
+		opts = append(opts, option.WithCredentialsFile("credentials.json"))
+	}
+
+	client, err := drive.NewService(ctx, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create google drive client: %w", err)
 	}

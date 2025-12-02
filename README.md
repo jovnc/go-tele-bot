@@ -14,7 +14,7 @@ A Telegram bot built with Go that allows you to share Google Drive folders to sp
 
 ### Prerequisites
 
-- Go 1.25.4 or later
+- Go 1.23 or later
 - A Telegram Bot Token (get one from [@BotFather](https://t.me/BotFather))
 - A publicly accessible URL for webhooks (e.g., using ngrok for local development)
 
@@ -55,17 +55,36 @@ Edit `data/folders.json` to add your Google Drive folders:
 make run
 ```
 
-## Bot Commands
+## Deploy to Google Cloud Run
 
-| Command  | Description                   |
-| -------- | ----------------------------- |
-| `/share` | Start the folder sharing flow |
+1. Set project and enable APIs
 
-## How It Works
+```bash
+gcloud config set project YOUR_PROJECT_ID
+gcloud services enable run.googleapis.com secretmanager.googleapis.com
+```
 
-1. User sends `/share` command
-2. Bot displays available folders as selectable buttons
-3. User toggles folders they want to share
-4. User clicks "Done" when finished selecting
-5. Bot prompts for an email address
-6. User enters the email to share the folders with
+2. Create secrets and store in google cloud secrets
+
+```bash
+echo -n "YOUR_BOT_TOKEN" | gcloud secrets create bot-token --data-file=-
+gcloud secrets create google-credentials --data-file=credentials.json
+```
+
+3. Deploy to google cloud run
+
+```bash
+gcloud run deploy go-tele-bot \
+    --source . \
+    --region asia-southeast1 \
+    --allow-unauthenticated \
+    --set-secrets=BOT_TOKEN=bot-token:latest,GOOGLE_CREDENTIALS_JSON=google-credentials:latest \
+    --set-env-vars="WEBHOOK_URL=https://placeholder.run.app"
+```
+
+4. Update with actual cloud run URL
+
+```bash
+CLOUD_RUN_URL=$(gcloud run services describe go-tele-bot --region us-central1 --format='value(status.url)')
+gcloud run services update go-tele-bot --region us-central1 --set-env-vars="WEBHOOK_URL=$CLOUD_RUN_URL"
+```
