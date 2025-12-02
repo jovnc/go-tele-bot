@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"go-tele-bot/internal/app/service"
 	"go-tele-bot/internal/data"
 	"go-tele-bot/internal/utils"
 
@@ -123,7 +124,15 @@ func ShareEmailHandler(ctx context.Context, b *bot.Bot, update *models.Update) b
 	state.Email = email
 	state.Step = stepDone
 
-	// TODO: share the selected items to the email
+	// Share the selected items to the email
+	shareService, err := service.NewShareService(ctx)
+	if err != nil {
+		return false
+	}
+	err = shareService.ShareFolders(ctx, state.Selected, email)
+	if err != nil {
+		return false
+	}
 
 	// TODO: send email to the user
 

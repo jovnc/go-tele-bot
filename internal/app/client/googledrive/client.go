@@ -36,3 +36,14 @@ func (c *GoogleDriveClient) ShareFolder(ctx context.Context, folderID string, em
 	}
 	return nil
 }
+
+// ShareFolders shares the folders with the given email address using the Google Drive API
+func (c *GoogleDriveClient) ShareFolders(ctx context.Context, folderIDs []string, email string) error {
+	for _, folderID := range folderIDs {
+		err := c.ShareFolder(ctx, folderID, email)
+		if err != nil {
+			return fmt.Errorf("failed to share folder %s with email %s: %w", folderID, email, err)
+		}
+	}
+	return nil
+}
