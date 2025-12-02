@@ -15,7 +15,7 @@ A Telegram bot built with Go that allows you to share Google Drive folders to sp
 
 - Go 1.25 or later
 - A Telegram Bot Token (get one from [@BotFather](https://t.me/BotFather))
-- A publicly accessible URL for webhooks (e.g., ngrok for local development)
+- A publicly accessible URL for webhooks (e.g., `ngrok` for local development)
 
 ### 1. Clone and Install
 

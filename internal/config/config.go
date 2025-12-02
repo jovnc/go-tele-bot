@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -11,6 +12,7 @@ type Config struct {
 	BotToken   string
 	WebhookURL string
 	Port       string
+	ValidUsernames []string
 }
 
 var GlobalConfig *Config
@@ -30,11 +32,13 @@ func LoadConfig() error {
 	}
 
 	port := getEnv("PORT", "8080")
+	validUsernames := strings.Split(getEnv("VALID_USERNAMES", ""), ",")
 
 	GlobalConfig = &Config{
 		BotToken:   botToken,
 		WebhookURL: webhookURL,
 		Port:       port,
+		ValidUsernames: validUsernames,
 	}
 
 	return nil

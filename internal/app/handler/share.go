@@ -3,9 +3,11 @@ package handler
 import (
 	"context"
 	"fmt"
+	"slices"
 	"strings"
 
 	"go-tele-bot/internal/app/service"
+	"go-tele-bot/internal/config"
 	"go-tele-bot/internal/data"
 	"go-tele-bot/internal/utils"
 
@@ -48,6 +50,16 @@ func ShareCommandHandler(ctx context.Context, b *bot.Bot, update *models.Update)
 
 	userID := update.Message.From.ID
 	chatID := update.Message.Chat.ID
+	username := update.Message.From.Username
+
+	// Check if username is in valid usernames
+	if !slices.Contains(config.GlobalConfig.ValidUsernames, username) {
+		b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID: chatID,
+			Text:   "You are not authorized to use this bot.",
+		})
+		return
+	}
 
 	// Initialize state for this user
 	state := &utils.UserState{
