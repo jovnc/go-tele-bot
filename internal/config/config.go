@@ -32,7 +32,7 @@ func LoadConfig() error {
 	}
 
 	port := getEnv("PORT", "8080")
-	validUsernames := strings.Split(getEnv("VALID_USERNAMES", ""), ",")
+	validUsernames := strings.Split(getEnv("VALID_USERNAMES", ""), ";")
 
 	GlobalConfig = &Config{
 		BotToken:   botToken,
