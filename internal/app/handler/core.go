@@ -2,8 +2,8 @@ package handler
 
 import (
 	"context"
-	"go-tele-bot/internal/config"
-	"slices"
+
+	"go-tele-bot/internal/app/middleware"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
@@ -11,28 +11,20 @@ import (
 
 // DefaultHandler processes messages that don't match specific handlers
 func DefaultHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
-	username := update.Message.From.Username
-	chatID := update.Message.Chat.ID
+	middleware.WithAuth(func(ctx context.Context, b *bot.Bot, update *models.Update) {
+		// Handle stateful flows (e.g., share email input)
+		if ShareEmailInputHandler(ctx, b, update) {
+			return
+		}
 
-	// Check if username is in valid usernames
-	if !slices.Contains(config.GlobalConfig.ValidUsernames, username) {
-		b.SendMessage(ctx, &bot.SendMessageParams{
-			ChatID: chatID,
-			Text:   "You are not authorized to use this bot.",
-		})
-		return
-	}
-
-	// Handle share command
-	if ShareEmailHandler(ctx, b, update) {
-		return
-	}
-
-	ErrorHandler(ctx, b, update)
+		// No match - show error
+		ErrorHandler(ctx, b, update)
+	})(ctx, b, update)
 }
 
 // RegisterHandlers registers all bot handlers
 func RegisterHandlers(b *bot.Bot) {
-	b.RegisterHandler(bot.HandlerTypeMessageText, "share", bot.MatchTypeCommand, ShareCommandHandler)
-	b.RegisterHandler(bot.HandlerTypeCallbackQueryData, "share_", bot.MatchTypePrefix, ShareCallbackHandler)
+	b.RegisterHandler(bot.HandlerTypeMessageText, "share", bot.MatchTypeCommand, middleware.WithAuth(ShareCommandHandler))
+	b.RegisterHandler(bot.HandlerTypeCallbackQueryData, "share_", bot.MatchTypePrefix, middleware.WithAuth(ShareCallbackHandler))
+	b.RegisterHandler(bot.HandlerTypeMessageText, "start", bot.MatchTypeCommand, middleware.WithAuth(StartCommandHandler))
 }

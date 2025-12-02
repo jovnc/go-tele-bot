@@ -50,7 +50,5 @@ func (s *ShareService) ShareFolders(ctx context.Context, selected map[string]boo
 		return fmt.Errorf("failed to share folders: %w", err)
 	}
 
-	// TODO: send email to the user
-
 	return nil
 }

@@ -27,6 +27,26 @@ const (
 	stepDone          = "done"
 )
 
+// Message text
+const (
+	messageShare       = "📤 <b>Share Folders</b>\n\n" +
+		"<b>Step 1 of 2:</b> Select items to share\n" +
+		"Tap to toggle selection:"
+	messageShareDone   = "✅ <b>Great choice!</b>\n\n" +
+		"<b>Step 2 of 2:</b> Enter recipient email\n\n" +
+		"📧 Type the email address below:"
+	messageShareCancel = "❌ <b>Cancelled</b>\n\n" +
+		"No folders were shared.\n" +
+		"Use /share to start again."
+	messageShareFailed = "⚠️ <b>Something went wrong</b>\n\n" +
+		"We couldn't share the folders.\n" +
+		"Please try again with /share"
+	messageShareSummary = "🎉 <b>Shared Successfully!</b>\n\n" +
+		"<b>Items shared:</b>\n%s\n\n" +
+		"<b>Shared with:</b> <code>%s</code>\n\n" +
+		"✅ The recipient will receive access shortly."
+)
+
 var shareState = utils.NewManager()
 
 // shareCallbackContext holds common data for share callback handlers
@@ -59,7 +79,7 @@ func ShareCommandHandler(ctx context.Context, b *bot.Bot, update *models.Update)
 	// Send options keyboard
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:      chatID,
-		Text:        "📤 <b>Share</b>\n\nSelect what you want to share (tap to toggle):",
+		Text:        messageShare,
 		ParseMode:   models.ParseModeHTML,
 		ReplyMarkup: utils.BuildSelectKeyboard(make(map[string]bool), callbackShareOptPrefix, callbackShareDone, callbackShareCancel),
 	})
@@ -106,8 +126,8 @@ func ShareCallbackHandler(ctx context.Context, b *bot.Bot, update *models.Update
 	}
 }
 
-// ShareEmailHandler handles email input
-func ShareEmailHandler(ctx context.Context, b *bot.Bot, update *models.Update) bool {
+// ShareEmailInputHandler handles email input for the share flow, returns true if handled
+func ShareEmailInputHandler(ctx context.Context, b *bot.Bot, update *models.Update) bool {
 	if update == nil || update.Message == nil || update.Message.Text == "" {
 		return false
 	}
@@ -129,7 +149,7 @@ func ShareEmailHandler(ctx context.Context, b *bot.Bot, update *models.Update) b
 	if err != nil {
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: chatID,
-			Text:   "❌ Failed to share folders. Please try again.",
+			Text:   messageShareFailed,
 		})
 		shareState.Delete(userID)
 		return true
@@ -139,13 +159,11 @@ func ShareEmailHandler(ctx context.Context, b *bot.Bot, update *models.Update) b
 	if err != nil {
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: chatID,
-			Text:   "❌ Failed to share folders. Please try again.",
+			Text:   messageShareFailed,
 		})
 		shareState.Delete(userID)
 		return true
 	}
-
-	// TODO: send email to the user
 
 	// Build summary
 	var selectedItems []string
@@ -155,14 +173,7 @@ func ShareEmailHandler(ctx context.Context, b *bot.Bot, update *models.Update) b
 		}
 	}
 
-	summary := fmt.Sprintf(
-		"🎉 <b>Share Summary</b>\n\n"+
-			"<b>Selected items:</b>\n%s\n\n"+
-			"<b>Email:</b> <code>%s</code>\n\n"+
-			"Thank you! Your share request has been received.",
-		strings.Join(selectedItems, "\n"),
-		email,
-	)
+	summary := fmt.Sprintf(messageShareSummary, strings.Join(selectedItems, "\n"), email)
 
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    chatID,
@@ -171,7 +182,6 @@ func ShareEmailHandler(ctx context.Context, b *bot.Bot, update *models.Update) b
 	})
 
 	shareState.Delete(userID)
-
 	return true
 }
 
@@ -198,7 +208,7 @@ func handleShareDone(cc *shareCallbackContext) {
 	cc.b.EditMessageText(cc.ctx, &bot.EditMessageTextParams{
 		ChatID:    cc.chatID,
 		MessageID: cc.messageID,
-		Text:      "✅ Options selected!\n\n📧 Now please enter your email address (with or without @gmail.com):",
+		Text:      messageShareDone,
 	})
 }
 
@@ -214,7 +224,7 @@ func handleShareCancel(cc *shareCallbackContext) {
 	cc.b.EditMessageText(cc.ctx, &bot.EditMessageTextParams{
 		ChatID:    cc.chatID,
 		MessageID: cc.messageID,
-		Text:      "❌ Share cancelled.",
+		Text:      messageShareCancel,
 	})
 }
 
