@@ -38,5 +38,6 @@ func (s *ShareService) ShareFolders(ctx context.Context, selected map[string]boo
 	if len(folderIDs) == 0 {
 		return fmt.Errorf("no folders to share")
 	}
+	// TODO: send email to the user
 	return s.client.ShareFolders(ctx, folderIDs, email)
 }
