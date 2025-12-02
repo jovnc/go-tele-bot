@@ -9,6 +9,11 @@ import (
 	"github.com/go-telegram/bot/models"
 )
 
+const (
+	messageAuthError = "🔒 <b>Access denied</b>\n\n" +
+		"You are not authorized to use this bot."
+)
+
 // WithAuth wraps a handler with authorization check
 func WithAuth(next bot.HandlerFunc) bot.HandlerFunc {
 	return func(ctx context.Context, b *bot.Bot, update *models.Update) {
@@ -17,7 +22,8 @@ func WithAuth(next bot.HandlerFunc) bot.HandlerFunc {
 		if !slices.Contains(config.GlobalConfig.ValidUsernames, username) {
 			b.SendMessage(ctx, &bot.SendMessageParams{
 				ChatID: chatID,
-				Text:   "You are not authorized to use this bot.",
+				Text:   messageAuthError,
+				ParseMode: models.ParseModeHTML,
 			})
 			return
 		}

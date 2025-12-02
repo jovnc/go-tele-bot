@@ -25,6 +25,6 @@ func DefaultHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 // RegisterHandlers registers all bot handlers
 func RegisterHandlers(b *bot.Bot) {
 	b.RegisterHandler(bot.HandlerTypeMessageText, "share", bot.MatchTypeCommand, middleware.WithAuth(ShareCommandHandler))
-	b.RegisterHandler(bot.HandlerTypeCallbackQueryData, "share_", bot.MatchTypePrefix, middleware.WithAuth(ShareCallbackHandler))
+	b.RegisterHandler(bot.HandlerTypeCallbackQueryData, "share_", bot.MatchTypePrefix, ShareCallbackHandler)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "start", bot.MatchTypeCommand, middleware.WithAuth(StartCommandHandler))
 }

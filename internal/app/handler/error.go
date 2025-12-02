@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	messageError = "🤔 <b>Unknown command</b>"
+	messageError = "🤔 Unknown command"
 )
 
 // ErrorHandler sends a message to the user if the message is not understood
