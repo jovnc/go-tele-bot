@@ -7,6 +7,7 @@ import (
 	"github.com/go-telegram/bot/models"
 )
 
+// ErrorHandler sends a message to the user if the message is not understood
 func ErrorHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: update.Message.Chat.ID,

@@ -7,6 +7,7 @@ import (
 	"github.com/go-telegram/bot/models"
 )
 
+// EchoHandler echoes the message back to the user
 func EchoHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	if update.Message == nil {
 		return
@@ -17,4 +18,3 @@ func EchoHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 		Text:   update.Message.Text,
 	})
 }
-
