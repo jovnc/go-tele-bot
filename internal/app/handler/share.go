@@ -33,7 +33,7 @@ const (
 		"<b>Step 1 of 2:</b> Select items to share\n" +
 		"Tap to toggle selection:"
 	messageShareDone   = "✅ <b>Great choice!</b>\n\n" +
-		"<b>Step 2 of 2:</b> Enter recipient email\n\n" +
+		"<b>Step 2 of 2:</b> Enter recipient email (with or without @gmail.com)\n\n" +
 		"📧 Type the email address below:"
 	messageShareCancel = "❌ <b>Cancelled</b>\n\n" +
 		"No folders were shared.\n" +
@@ -209,6 +209,7 @@ func handleShareDone(cc *shareCallbackContext) {
 		ChatID:    cc.chatID,
 		MessageID: cc.messageID,
 		Text:      messageShareDone,
+		ParseMode: models.ParseModeHTML,
 	})
 }
 
@@ -225,6 +226,7 @@ func handleShareCancel(cc *shareCallbackContext) {
 		ChatID:    cc.chatID,
 		MessageID: cc.messageID,
 		Text:      messageShareCancel,
+		ParseMode: models.ParseModeHTML,
 	})
 }
 
