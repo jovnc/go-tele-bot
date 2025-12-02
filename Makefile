@@ -6,7 +6,7 @@ BUILD_DIR=./build
 
 build:
 	@echo "Building $(APP_NAME)..."
-	@go build -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/api
+	@go build -o $(BUILD_DIR)/$(BINARY_NAME) main.go
 
 start:build
 	@echo "Starting $(APP_NAME)..."
