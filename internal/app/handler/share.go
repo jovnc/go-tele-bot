@@ -71,10 +71,15 @@ func ShareCallbackHandler(ctx context.Context, b *bot.Bot, update *models.Update
 	}
 
 	userID := update.CallbackQuery.From.ID
+	chatID := update.CallbackQuery.Message.Message.Chat.ID
+	messageID := update.CallbackQuery.Message.Message.ID
+	callbackID := update.CallbackQuery.ID
+	data := update.CallbackQuery.Data
+
 	state := shareState.Get(userID)
 	if state == nil || state.Step != stepSelectOptions {
 		b.AnswerCallbackQuery(ctx, &bot.AnswerCallbackQueryParams{
-			CallbackQueryID: update.CallbackQuery.ID,
+			CallbackQueryID: callbackID,
 			Text:            "Please start with /share",
 		})
 		return
@@ -83,14 +88,13 @@ func ShareCallbackHandler(ctx context.Context, b *bot.Bot, update *models.Update
 	cc := &shareCallbackContext{
 		ctx:        ctx,
 		b:          b,
-		callbackID: update.CallbackQuery.ID,
+		callbackID: callbackID,
 		userID:     userID,
-		chatID:     update.CallbackQuery.Message.Message.Chat.ID,
-		messageID:  update.CallbackQuery.Message.Message.ID,
+		chatID:     chatID,
+		messageID:  messageID,
 		state:      state,
 	}
 
-	data := update.CallbackQuery.Data
 	switch {
 	case data == callbackShareDone:
 		handleShareDone(cc)
@@ -103,7 +107,7 @@ func ShareCallbackHandler(ctx context.Context, b *bot.Bot, update *models.Update
 
 // ShareEmailHandler handles email input
 func ShareEmailHandler(ctx context.Context, b *bot.Bot, update *models.Update) bool {
-	if update.Message == nil || update.Message.Text == "" {
+	if update == nil || update.Message == nil || update.Message.Text == "" {
 		return false
 	}
 
@@ -146,7 +150,6 @@ func ShareEmailHandler(ctx context.Context, b *bot.Bot, update *models.Update) b
 		ParseMode: models.ParseModeHTML,
 	})
 
-	// Clean up state
 	shareState.Delete(userID)
 
 	return true
