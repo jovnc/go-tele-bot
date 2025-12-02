@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"go-tele-bot/internal/app/client/googledrive"
 	"go-tele-bot/internal/data"
@@ -38,6 +39,18 @@ func (s *ShareService) ShareFolders(ctx context.Context, selected map[string]boo
 	if len(folderIDs) == 0 {
 		return fmt.Errorf("no folders to share")
 	}
+
+	// if email does not contain @, append @gmail.com
+	if !strings.Contains(email, "@") {
+		email = fmt.Sprintf("%s@gmail.com", email)
+	}
+
+	err = s.client.ShareFolders(ctx, folderIDs, email)
+	if err != nil {
+		return fmt.Errorf("failed to share folders: %w", err)
+	}
+
 	// TODO: send email to the user
-	return s.client.ShareFolders(ctx, folderIDs, email)
+
+	return nil
 }

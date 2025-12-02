@@ -127,11 +127,22 @@ func ShareEmailHandler(ctx context.Context, b *bot.Bot, update *models.Update) b
 	// Share the selected items to the email
 	shareService, err := service.NewShareService(ctx)
 	if err != nil {
-		return false
+		b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID: chatID,
+			Text:   "❌ Failed to share folders. Please try again.",
+		})
+		shareState.Delete(userID)
+		return true
 	}
+
 	err = shareService.ShareFolders(ctx, state.Selected, email)
 	if err != nil {
-		return false
+		b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID: chatID,
+			Text:   "❌ Failed to share folders. Please try again.",
+		})
+		shareState.Delete(userID)
+		return true
 	}
 
 	// TODO: send email to the user
@@ -187,7 +198,7 @@ func handleShareDone(cc *shareCallbackContext) {
 	cc.b.EditMessageText(cc.ctx, &bot.EditMessageTextParams{
 		ChatID:    cc.chatID,
 		MessageID: cc.messageID,
-		Text:      "✅ Options selected!\n\n📧 Now please enter your email address:",
+		Text:      "✅ Options selected!\n\n📧 Now please enter your email address (with or without @gmail.com):",
 	})
 }
 
