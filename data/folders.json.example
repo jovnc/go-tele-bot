@@ -1,0 +1,14 @@
+[
+  {
+    "folder_name": "Folder 1",
+    "folder_id": "your_google_drive_folder_id"
+  },
+  {
+    "folder_name": "Folder 2",
+    "folder_id": "your_google_drive_folder_id"
+  },
+  {
+    "folder_name": "Folder 3",
+    "folder_id": "your_google_drive_folder_id"
+  }
+]

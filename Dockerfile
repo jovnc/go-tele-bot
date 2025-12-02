@@ -10,7 +10,7 @@ RUN go mod download
 COPY . .
 
 # Build the binary
-RUN CGO_ENABLED=0 GOOS=linux go build -o /bot main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o bot main.go
 
 # Final stage
 FROM alpine:latest
@@ -19,7 +19,8 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /root/
 
-COPY --from=builder /bot .
+COPY --from=builder /app/bot .
+COPY --from=builder /app/data ./data
 
 # Cloud Run sets PORT env var
 EXPOSE 8080

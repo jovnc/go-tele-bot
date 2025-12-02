@@ -5,18 +5,17 @@ A Telegram bot built with Go that allows you to share Google Drive folders to sp
 ## Features
 
 - 📂 Select from pre-configured Google Drive folders
-- ✅ Multi-select support with toggle buttons
 - 📧 Share folders to any email address
 - 🚀 Webhook-based for efficient message handling
 - 🐳 Docker support for easy deployment
 
-## Quick Start
+## Quick Start (Local Development)
 
 ### Prerequisites
 
-- Go 1.23 or later
+- Go 1.25 or later
 - A Telegram Bot Token (get one from [@BotFather](https://t.me/BotFather))
-- A publicly accessible URL for webhooks (e.g., using ngrok for local development)
+- A publicly accessible URL for webhooks (e.g., ngrok for local development)
 
 ### 1. Clone and Install
 
@@ -28,17 +27,11 @@ go mod download && go mod verify
 
 ### 2. Configure Environment
 
-Create a `.env` file in the project root with the following variables:
-
-| Variable      | Description                                 | Required |
-| ------------- | ------------------------------------------- | -------- |
-| `BOT_TOKEN`   | Your Telegram bot token from BotFather      | Yes      |
-| `WEBHOOK_URL` | Public URL where Telegram will send updates | Yes      |
-| `PORT`        | Server port (default: 8080)                 | No       |
+Create a `.env` file in the project root by copying from `.env.example` and filling in the values.
 
 ### 3. Configure Folders
 
-Edit `data/folders.json` to add your Google Drive folders:
+Edit `data/folders.json` by copying from `data/folders.json.example` and filling in the values.
 
 ```json
 [
@@ -49,42 +42,58 @@ Edit `data/folders.json` to add your Google Drive folders:
 ]
 ```
 
+> Note: You can get the folder ID by clicking on the folder in Google Drive and copying the ID from the URL.
+> Example: `https://drive.google.com/drive/u/0/folders/1234567890`
+> The folder ID is `1234567890`.
+
 ### 4. Run the Bot
 
 ```bash
 make run
 ```
 
-## Deploy to Google Cloud Run
+## Quick Start (Docker)
 
-1. Set project and enable APIs
+### Prerequisites
+
+- Docker installed and running
+- `.env` file with the values filled in
+- `data/folders.json` file with the values filled in
+
+### Build and Run Docker Image
+
+This will build the Docker image and run the container.
 
 ```bash
-gcloud config set project YOUR_PROJECT_ID
-gcloud services enable run.googleapis.com secretmanager.googleapis.com
+make docker-run
 ```
 
-2. Create secrets and store in google cloud secrets
+## Quick Start (Google Cloud Run)
+
+### Prerequisites
+
+- `gcloud` CLI installed and authenticated (https://cloud.google.com/sdk/docs/install)
+- A Telegram Bot Token (get one from [@BotFather](https://t.me/BotFather))
+- `data/folders.json` file with the values filled in
+- `credentials.json` file with service account credentials (create one from [Google Cloud Console](https://console.cloud.google.com/iam-admin/serviceaccounts))
+
+> Note: service account needs to have the following permissions:
+>
+> - Google Drive API
+> - Folder permissions to the folders to be shared (write/owner access)
+
+### Deploy Setup for Google Cloud Run
+
+This will setup the deployment for Google Cloud Run. Run this in the first deployment to google cloud run.
 
 ```bash
-echo -n "YOUR_BOT_TOKEN" | gcloud secrets create bot-token --data-file=-
-gcloud secrets create google-credentials --data-file=credentials.json
+make deploy-setup
 ```
 
-3. Deploy to google cloud run
+### Deploy to Google Cloud Run
+
+This will update the deployment for Google Cloud Run. Run this to update the bot.
 
 ```bash
-gcloud run deploy go-tele-bot \
-    --source . \
-    --region asia-southeast1 \
-    --allow-unauthenticated \
-    --set-secrets=BOT_TOKEN=bot-token:latest,GOOGLE_CREDENTIALS_JSON=google-credentials:latest \
-    --set-env-vars="WEBHOOK_URL=https://placeholder.run.app"
-```
-
-4. Update with actual cloud run URL
-
-```bash
-CLOUD_RUN_URL=$(gcloud run services describe go-tele-bot --region us-central1 --format='value(status.url)')
-gcloud run services update go-tele-bot --region us-central1 --set-env-vars="WEBHOOK_URL=$CLOUD_RUN_URL"
+make deploy
 ```

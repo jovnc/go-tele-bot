@@ -1,0 +1,25 @@
+# Git
+.git
+.gitignore
+
+# Environment and secrets
+.env
+.env.*
+credentials.json
+
+# IDE
+.idea
+.vscode
+.cursor
+
+# Build artifacts
+build/
+bin/
+
+# Documentation
+README.md
+LICENSE
+
+# Local development
+Makefile
+docker-compose*.yml

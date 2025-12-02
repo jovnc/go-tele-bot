@@ -1,0 +1,28 @@
+# Git
+.git
+.gitignore
+
+# Environment files
+.env
+.env.*
+*.env
+
+# IDE
+.idea
+.vscode
+.cursor
+*.swp
+*.swo
+
+# Build artifacts
+build/
+bin/
+*.exe
+
+# Documentation
+README.md
+LICENSE
+
+# Local development
+Makefile
+docker-compose*.yml
