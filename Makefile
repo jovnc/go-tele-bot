@@ -22,11 +22,6 @@ deploy:
 	@chmod +x scripts/deploy.sh
 	@scripts/deploy.sh
 
-deploy-setup:
-	@echo "Setting up deployment for $(APP_NAME)..."
-	@chmod +x scripts/deploy-setup.sh
-	@scripts/deploy-setup.sh
-
 docker-run:
 	@echo "Running $(APP_NAME) in Docker..."
 	@chmod +x scripts/docker-run.sh
