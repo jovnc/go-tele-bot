@@ -9,7 +9,6 @@ import (
 
 const (
 	messageStart = "👋 <b>Welcome!</b>\n\n" +
-		"I help you share Google Drive folders with others.\n\n" +
 		"<b>Available commands:</b>\n" +
 		"/share — Share folders with someone" + 
 		"/lc <topic> — Start LC practice session"
