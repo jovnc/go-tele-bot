@@ -80,7 +80,6 @@ func LcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	_, err := b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    chatID,
 		Text:      statusMsg,
-		ParseMode: models.ParseModeMarkdown,
 	})
 	if err != nil {
 		log.Printf("Error sending status message: %v", err)
