@@ -104,11 +104,26 @@ func LcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	lcState.Set(userID, state)
 
 	// Send the problem to user
-	b.SendMessage(ctx, &bot.SendMessageParams{
+	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    chatID,
 		Text:      problem,
 		ParseMode: models.ParseModeHTML,
 	})
+	if err != nil {
+		log.Printf("[LC] Error sending problem with HTML to user %d: %v", userID, err)
+		// Fallback: try sending as plain text
+		_, err = b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID: chatID,
+			Text:   problem,
+		})
+		if err != nil {
+			log.Printf("[LC] Error sending problem as plain text to user %d: %v", userID, err)
+		} else {
+			log.Printf("[LC] Successfully sent problem as plain text to user %d", userID)
+		}
+	} else {
+		log.Printf("[LC] Successfully sent problem with HTML to user %d", userID)
+	}
 }
 
 // LcMessageHandler processes messages when user is in LC mode
@@ -161,11 +176,26 @@ func LcMessageHandler(ctx context.Context, b *bot.Bot, update *models.Update) bo
 	lcState.Set(userID, state)
 
 	// Send response to user
-	b.SendMessage(ctx, &bot.SendMessageParams{
+	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    chatID,
 		Text:      answer,
 		ParseMode: models.ParseModeHTML,
 	})
+	if err != nil {
+		log.Printf("[LC] Error sending answer with HTML to user %d: %v", userID, err)
+		// Fallback: try sending as plain text
+		_, err = b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID: chatID,
+			Text:   answer,
+		})
+		if err != nil {
+			log.Printf("[LC] Error sending answer as plain text to user %d: %v", userID, err)
+		} else {
+			log.Printf("[LC] Successfully sent answer as plain text to user %d", userID)
+		}
+	} else {
+		log.Printf("[LC] Successfully sent answer with HTML to user %d", userID)
+	}
 
 	return true
 }
