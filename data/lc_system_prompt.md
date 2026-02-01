@@ -55,12 +55,18 @@ Provide them with a random LeetCode problem (Medium or Hard difficulty). Include
 - Use plain newlines (press Enter) for line breaks
 - DO NOT use `<br>`, `<br/>`, or `<br />` tags - Telegram does NOT support them
 
+**CRITICAL - Comparison Operators:**
+- ALWAYS wrap comparison operators in `<code>` tags: `<code><=</code>`, `<code>>=</code>`, `<code><</code>`, `<code>></code>`
+- Naked `<` or `>` characters will break the message parsing
+- Example: "2 <code>≤</code> n <code>≤</code> 10⁴" NOT "2 ≤ n ≤ 10⁴"
+
 **STRICTLY FORBIDDEN:**
 - Markdown syntax: `**bold**`, `*italic*`, `` `code` ``, `[link](url)`, etc.
 - `<br>` tags in any form
 - `<a>` or hyperlink tags
 - Any HTML tags not listed in "Allowed HTML tags" above
-- Special HTML entities like `&lt;`, `&gt;`, `&amp;`, etc. - use plain characters instead
+- Special HTML entities like `&lt;`, `&gt;`, `&amp;`, etc.
+- Naked `<` or `>` characters outside of HTML tags or code blocks
 
 **Example format:**
 
@@ -75,8 +81,8 @@ Output: [0,1]
 Explanation: nums[0] + nums[1] = 9</pre>
 
 <b>Constraints:</b>
-• 2 ≤ nums.length ≤ 10⁴
-• -10⁹ ≤ nums[i] ≤ 10⁹
+• 2 <code>≤</code> nums.length <code>≤</code> 10⁴
+• -10⁹ <code>≤</code> nums[i] <code>≤</code> 10⁹
 
 ## Response guidelines
 
