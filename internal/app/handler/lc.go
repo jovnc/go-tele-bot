@@ -17,12 +17,8 @@ import (
 
 // Message text
 const (
-	messageLcError = "⚠️ *Something went wrong*\\n\\n" +
-		"We couldn't process your request\\.\\n" +
-		"Please try again with /lc"
-	messageLcExit = "👋 *Exited LC Mode*\\n\\n" +
-		"You've returned to default mode\\.\\n" +
-		"Use /lc anytime to practice more LeetCode problems\\!"
+	messageLcError = "⚠️ Something went wrong"
+	messageLcExit = "👋 Exited LC Mode"
 )
 
 var lcState = utils.NewManager()
@@ -79,7 +75,7 @@ func LcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	// Send immediate feedback to user
 	statusMsg := "🤖 Generating a LeetCode problem for you..."
 	if topic != "" {
-		statusMsg = fmt.Sprintf("🤖 Generating a LeetCode problem about *%s* for you...", topic)
+		statusMsg = fmt.Sprintf("🤖 Generating a LeetCode problem about %s for you...", topic)
 	}
 	_, err := b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    chatID,
@@ -96,7 +92,6 @@ func LcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:    chatID,
 			Text:      messageLcError,
-			ParseMode: models.ParseModeMarkdown,
 		})
 		return
 	}
@@ -125,19 +120,18 @@ func LcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 		ParseMode: models.ParseModeMarkdown,
 	})
 	if err != nil {
-		log.Printf("[LC] Error sending problem with Markdown to user %d: %v", userID, err)
-		// Fallback: try sending as plain text
+		log.Printf("Error sending problem with Markdown to user %d: %v", userID, err)
 		_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: chatID,
 			Text:   problem,
 		})
 		if err != nil {
-			log.Printf("[LC] Error sending problem as plain text to user %d: %v", userID, err)
+			log.Printf("Error sending problem as plain text to user %d: %v", userID, err)
 		} else {
-			log.Printf("[LC] Successfully sent problem as plain text to user %d", userID)
+			log.Printf("Successfully sent problem as plain text to user %d", userID)
 		}
 	} else {
-		log.Printf("[LC] Successfully sent problem with Markdown to user %d", userID)
+		log.Printf("Successfully sent problem with Markdown to user %d", userID)
 	}
 }
 
@@ -198,19 +192,18 @@ func LcMessageHandler(ctx context.Context, b *bot.Bot, update *models.Update) bo
 		ParseMode: models.ParseModeMarkdown,
 	})
 	if err != nil {
-		log.Printf("[LC] Error sending answer with Markdown to user %d: %v", userID, err)
-		// Fallback: try sending as plain text
+		log.Printf("Error sending answer with Markdown to user %d: %v", userID, err)
 		_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: chatID,
 			Text:   answer,
 		})
 		if err != nil {
-			log.Printf("[LC] Error sending answer as plain text to user %d: %v", userID, err)
+			log.Printf("Error sending answer as plain text to user %d: %v", userID, err)
 		} else {
-			log.Printf("[LC] Successfully sent answer as plain text to user %d", userID)
+			log.Printf("Successfully sent answer as plain text to user %d", userID)
 		}
 	} else {
-		log.Printf("[LC] Successfully sent answer with Markdown to user %d", userID)
+		log.Printf("Successfully sent answer with Markdown to user %d", userID)
 	}
 
 	return true
@@ -233,6 +226,5 @@ func ExitLcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    chatID,
 		Text:      messageLcExit,
-		ParseMode: models.ParseModeMarkdown,
 	})
 }

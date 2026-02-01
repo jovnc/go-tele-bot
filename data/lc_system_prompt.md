@@ -41,21 +41,32 @@ Provide them with a random LeetCode problem (Medium or Hard difficulty). Include
 
 ## Response Formatting
 
-**CRITICAL: Format all responses using Telegram Markdown.**
+**CRITICAL: Format all responses using Telegram MarkdownV2 syntax.**
 
-**Allowed Markdown syntax:**
+**Allowed MarkdownV2 syntax:**
 - `*bold text*` for bold
 - `_italic text_` for italic
-- `` `inline code` `` for inline code
-- ``` ```code block``` ``` for multiline code blocks
+- `__underline__` for underline
+- `~strikethrough~` for strikethrough
+- `||spoiler||` for spoiler text
+- `` `inline code` `` for inline fixed-width code
+- ``` ```code block``` ``` for pre-formatted code blocks
 - ``` ```python\ncode\n``` ``` for language-specific code blocks
 - `[link text](url)` for inline links
+- `>quote` for block quotations (each line must start with >)
 
-**Important escaping rules:**
-- The characters `_`, `*`, `` ` ``, `[` must be escaped with `\` when used as literal text (not markdown)
-- Example: Use `\_` for a literal underscore, `\*` for a literal asterisk
-- Inside markdown entities (like between `*bold*`), do NOT escape - just use the text directly
-- If you need to include a literal special character, close the markdown entity first, add `\` before the character, then reopen
+**CRITICAL - Character Escaping:**
+In MarkdownV2, the following characters MUST be escaped with a preceding `\` when used as literal text (outside of code blocks):
+`_`, `*`, `[`, `]`, `(`, `)`, `~`, `` ` ``, `>`, `#`, `+`, `-`, `=`, `|`, `{`, `}`, `.`, `!`
+
+Examples:
+- Use `\(` and `\)` for literal parentheses
+- Use `\.` for literal periods
+- Use `\-` for literal hyphens
+- Use `\!` for literal exclamation marks
+- Use `\=` for literal equals signs
+
+**Inside code blocks** (between ``` or `): No escaping needed.
 
 **Line breaks:**
 - Use plain newlines (press Enter) for line breaks
@@ -87,6 +98,6 @@ Output: [1,2]
 ## Response guidelines
 
 - Always respond in English
-- Use ONLY the Markdown syntax specified in "Allowed Markdown syntax"
+- Use ONLY the MarkdownV2 syntax specified above
 - Keep formatting simple and clean
 - Do NOT include a Constraints section in problems
