@@ -17,12 +17,12 @@ import (
 
 // Message text
 const (
-	messageLcError = "⚠️ <b>Something went wrong</b>\n\n" +
-		"We couldn't process your request.\n" +
+	messageLcError = "⚠️ *Something went wrong*\\n\\n" +
+		"We couldn't process your request\\.\\n" +
 		"Please try again with /lc"
-	messageLcExit = "👋 <b>Exited LC Mode</b>\n\n" +
-		"You've returned to default mode.\n" +
-		"Use /lc anytime to practice more LeetCode problems!"
+	messageLcExit = "👋 *Exited LC Mode*\\n\\n" +
+		"You've returned to default mode\\.\\n" +
+		"Use /lc anytime to practice more LeetCode problems\\!"
 )
 
 var lcState = utils.NewManager()
@@ -79,12 +79,12 @@ func LcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	// Send immediate feedback to user
 	statusMsg := "🤖 Generating a LeetCode problem for you..."
 	if topic != "" {
-		statusMsg = fmt.Sprintf("🤖 Generating a LeetCode problem about <b>%s</b> for you...", topic)
+		statusMsg = fmt.Sprintf("🤖 Generating a LeetCode problem about *%s* for you...", topic)
 	}
 	_, err := b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    chatID,
 		Text:      statusMsg,
-		ParseMode: models.ParseModeHTML,
+		ParseMode: models.ParseModeMarkdown,
 	})
 	if err != nil {
 		log.Printf("Error sending status message: %v", err)
@@ -96,6 +96,7 @@ func LcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:    chatID,
 			Text:      messageLcError,
+			ParseMode: models.ParseModeMarkdown,
 		})
 		return
 	}
@@ -121,10 +122,10 @@ func LcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    chatID,
 		Text:      problem,
-		ParseMode: models.ParseModeHTML,
+		ParseMode: models.ParseModeMarkdown,
 	})
 	if err != nil {
-		log.Printf("[LC] Error sending problem with HTML to user %d: %v", userID, err)
+		log.Printf("[LC] Error sending problem with Markdown to user %d: %v", userID, err)
 		// Fallback: try sending as plain text
 		_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: chatID,
@@ -136,7 +137,7 @@ func LcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 			log.Printf("[LC] Successfully sent problem as plain text to user %d", userID)
 		}
 	} else {
-		log.Printf("[LC] Successfully sent problem with HTML to user %d", userID)
+		log.Printf("[LC] Successfully sent problem with Markdown to user %d", userID)
 	}
 }
 
@@ -170,6 +171,7 @@ func LcMessageHandler(ctx context.Context, b *bot.Bot, update *models.Update) bo
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:    chatID,
 			Text:      messageLcError,
+			ParseMode: models.ParseModeMarkdown,
 		})
 		return true
 	}
@@ -193,10 +195,10 @@ func LcMessageHandler(ctx context.Context, b *bot.Bot, update *models.Update) bo
 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    chatID,
 		Text:      answer,
-		ParseMode: models.ParseModeHTML,
+		ParseMode: models.ParseModeMarkdown,
 	})
 	if err != nil {
-		log.Printf("[LC] Error sending answer with HTML to user %d: %v", userID, err)
+		log.Printf("[LC] Error sending answer with Markdown to user %d: %v", userID, err)
 		// Fallback: try sending as plain text
 		_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: chatID,
@@ -208,18 +210,13 @@ func LcMessageHandler(ctx context.Context, b *bot.Bot, update *models.Update) bo
 			log.Printf("[LC] Successfully sent answer as plain text to user %d", userID)
 		}
 	} else {
-		log.Printf("[LC] Successfully sent answer with HTML to user %d", userID)
+		log.Printf("[LC] Successfully sent answer with Markdown to user %d", userID)
 	}
 
 	return true
 }
 
-// ExitLcHandler handles the /exit command
 func ExitLcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
-	if update.Message == nil {
-		return
-	}
-
 	userID := update.Message.From.ID
 	chatID := update.Message.Chat.ID
 
@@ -236,6 +233,6 @@ func ExitLcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    chatID,
 		Text:      messageLcExit,
-		ParseMode: models.ParseModeHTML,
+		ParseMode: models.ParseModeMarkdown,
 	})
 }
