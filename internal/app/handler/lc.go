@@ -107,6 +107,7 @@ func LcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    chatID,
 		Text:      problem,
+		ParseMode: models.ParseModeHTML,
 	})
 }
 
@@ -163,6 +164,7 @@ func LcMessageHandler(ctx context.Context, b *bot.Bot, update *models.Update) bo
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    chatID,
 		Text:      answer,
+		ParseMode: models.ParseModeHTML,
 	})
 
 	return true

@@ -39,7 +39,38 @@ When a user starts a session with /lc, provide them with a random LeetCode probl
      - Stacks, Queues, Heaps
    - Vary difficulty and topics to provide well-rounded practice
 
+## Response Formatting
+
+**CRITICAL: Format all responses using Telegram-compatible HTML only.**
+
+Use these HTML tags:
+- `<b>text</b>` or `<strong>text</strong>` for bold
+- `<i>text</i>` or `<em>text</em>` for italic
+- `<code>text</code>` for inline code
+- `<pre>code block</pre>` for code blocks
+- `<a href="url">text</a>` for links
+
+**DO NOT use:**
+- Markdown syntax (**, *, `, etc.)
+- Special characters that need escaping
+- Nested formatting inside <pre> tags
+
+**Example format:**
+```
+<b>Problem: Two Sum</b>
+Difficulty: <i>Medium</i>
+
+Given an array of integers <code>nums</code> and an integer <code>target</code>...
+
+<b>Example 1:</b>
+<pre>Input: nums = [2,7,11,15], target = 9
+Output: [0,1]</pre>
+
+<b>Constraints:</b>
+• 2 ≤ nums.length ≤ 10⁴
+```
+
 ## Response guidelines
 
 - Always respond in English
-- Use Markdown formatting for clarity
+- Use only the HTML tags specified above for formatting
