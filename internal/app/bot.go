@@ -26,6 +26,11 @@ func NewTelegramBot(botToken string) (*TelegramBot, error) {
 		return nil, err
 	}
 
+	// Initialize LC handler
+	if err := handler.InitLcHandler(); err != nil {
+		return nil, fmt.Errorf("failed to initialize LC handler: %w", err)
+	}
+
 	handler.RegisterHandlers(b)
 
 	return &TelegramBot{
@@ -34,8 +39,18 @@ func NewTelegramBot(botToken string) (*TelegramBot, error) {
 }
 
 // Start bot using long polling
-func (b *TelegramBot) Start(ctx context.Context) {
+func (b *TelegramBot) Start(ctx context.Context) error {
+	// Delete webhook before starting polling
+	_, err := b.bot.DeleteWebhook(ctx, &bot.DeleteWebhookParams{
+		DropPendingUpdates: true,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to delete webhook: %w", err)
+	}
+	log.Println("Webhook deleted, starting polling mode...")
+	
 	b.bot.Start(ctx)
+	return nil
 }
 
 // Start bot using webhook (preferred)
