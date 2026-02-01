@@ -73,13 +73,13 @@ func LcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	}
 
 	// Send immediate feedback to user
-	statusMsg := "🤖 Generating a LeetCode problem for you..."
+	statusMsg := "Generating a LeetCode problem for you"
 	if topic != "" {
-		statusMsg = fmt.Sprintf("🤖 Generating a LeetCode problem about %s for you...", topic)
+		statusMsg = fmt.Sprintf("Generating a LeetCode problem about %s for you", topic)
 	}
 	_, err := b.SendMessage(ctx, &bot.SendMessageParams{
-		ChatID:    chatID,
-		Text:      statusMsg,
+		ChatID: chatID,
+		Text:   statusMsg,
 	})
 	if err != nil {
 		log.Printf("Error sending status message: %v", err)
@@ -162,9 +162,8 @@ func LcMessageHandler(ctx context.Context, b *bot.Bot, update *models.Update) bo
 	if err != nil {
 		log.Printf("Error asking question: %v", err)
 		b.SendMessage(ctx, &bot.SendMessageParams{
-			ChatID:    chatID,
-			Text:      messageLcError,
-			ParseMode: models.ParseModeMarkdown,
+			ChatID: chatID,
+			Text:   messageLcError,
 		})
 		return true
 	}

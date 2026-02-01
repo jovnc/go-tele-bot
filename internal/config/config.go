@@ -19,7 +19,6 @@ type Config struct {
 var GlobalConfig *Config
 
 func LoadConfig() error {
-	// Load .env file if it exists
 	_ = godotenv.Load()
 
 	botToken := getEnv("BOT_TOKEN", "")

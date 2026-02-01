@@ -93,7 +93,7 @@ func (s *OpenAIService) AskQuestion(ctx context.Context, conversationHistory []M
 	messages = append(messages, openai.UserMessage(question))
 
 	params := openai.ChatCompletionNewParams{
-		Model:    openai.ChatModelGPT4oMini,
+		Model:    openai.ChatModelGPT5_2ChatLatest,
 		Messages: messages,
 	}
 
