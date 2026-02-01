@@ -13,7 +13,9 @@ if ! gcloud config get project &> /dev/null; then
 fi
 
 # Load all variables from .env
-export "$(cat .env | xargs)"
+set -a
+source .env
+set +a 
 
 if [ -z "$BOT_TOKEN" ]; then
     echo "Error: BOT_TOKEN is not set"
