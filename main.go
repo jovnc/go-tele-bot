@@ -7,6 +7,7 @@ import (
 	"os/signal"
 
 	"go-tele-bot/internal/app"
+	"go-tele-bot/internal/app/handler"
 	"go-tele-bot/internal/config"
 	"go-tele-bot/internal/data"
 )
@@ -24,6 +25,11 @@ func main() {
 	// Load data
 	if err := data.Load(); err != nil {
 		log.Fatalf("Failed to load data: %v", err)
+	}
+
+	// Initialize handlers
+	if err := handler.InitLcHandler(); err != nil {
+		log.Fatalf("Failed to initialize LC handler: %v", err)
 	}
 
 	// Start the bot

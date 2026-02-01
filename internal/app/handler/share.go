@@ -29,10 +29,10 @@ const (
 
 // Message text
 const (
-	messageShare       = "📤 <b>Share Folders</b>\n\n" +
+	messageShare = "📤 <b>Share Folders</b>\n\n" +
 		"<b>Step 1 of 2:</b> Select items to share\n" +
 		"Tap to toggle selection:"
-	messageShareDone   = "✅ <b>Great choice!</b>\n\n" +
+	messageShareDone = "✅ <b>Great choice!</b>\n\n" +
 		"<b>Step 2 of 2:</b> Enter recipient email (with or without @gmail.com)\n\n" +
 		"📧 Type the email address below:"
 	messageShareCancel = "❌ <b>Cancelled</b>\n\n" +
@@ -48,6 +48,16 @@ const (
 )
 
 var shareState = utils.NewManager()
+
+// GetShareState returns the share state for a user
+func GetShareState(userID int64) *utils.UserState {
+	return shareState.Get(userID)
+}
+
+// getLcState is a helper to check if user is in LC flow
+func getLcState(userID int64) *utils.UserState {
+	return GetLcState(userID)
+}
 
 // shareCallbackContext holds common data for share callback handlers
 type shareCallbackContext struct {
@@ -68,6 +78,15 @@ func ShareCommandHandler(ctx context.Context, b *bot.Bot, update *models.Update)
 
 	userID := update.Message.From.ID
 	chatID := update.Message.Chat.ID
+
+	// Check if user is already in LC flow
+	if lcState := getLcState(userID); lcState != nil {
+		b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID:    chatID,
+			Text:      "⚠️ Please exit LC mode with /exit before starting a share flow.",
+		})
+		return
+	}
 
 	// Initialize state for this user
 	state := &utils.UserState{

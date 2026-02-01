@@ -26,11 +26,6 @@ func NewTelegramBot(botToken string) (*TelegramBot, error) {
 		return nil, err
 	}
 
-	// Initialize LC handler
-	if err := handler.InitLcHandler(); err != nil {
-		return nil, fmt.Errorf("failed to initialize LC handler: %w", err)
-	}
-
 	handler.RegisterHandlers(b)
 
 	return &TelegramBot{

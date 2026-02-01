@@ -12,6 +12,11 @@ import (
 // DefaultHandler processes messages that don't match specific handlers
 func DefaultHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	middleware.WithAuth(func(ctx context.Context, b *bot.Bot, update *models.Update) {
+		// Handle LC mode messages first
+		if LcMessageHandler(ctx, b, update) {
+			return
+		}
+
 		// Handle stateful flows (e.g., share email input)
 		if ShareEmailInputHandler(ctx, b, update) {
 			return
@@ -27,4 +32,6 @@ func RegisterHandlers(b *bot.Bot) {
 	b.RegisterHandler(bot.HandlerTypeMessageText, "share", bot.MatchTypeCommand, middleware.WithAuth(ShareCommandHandler))
 	b.RegisterHandler(bot.HandlerTypeCallbackQueryData, "share_", bot.MatchTypePrefix, ShareCallbackHandler)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "start", bot.MatchTypeCommand, middleware.WithAuth(StartCommandHandler))
+	b.RegisterHandler(bot.HandlerTypeMessageText, "lc", bot.MatchTypeCommand, middleware.WithAuth(LcHandler))
+	b.RegisterHandler(bot.HandlerTypeMessageText, "exit", bot.MatchTypeCommand, middleware.WithAuth(ExitLcHandler))
 }

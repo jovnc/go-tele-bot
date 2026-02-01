@@ -5,9 +5,16 @@ import (
 )
 
 type UserState struct {
-	Step     string
-	Selected map[string]bool
-	Email    string
+	Step                string
+	Selected            map[string]bool
+	Email               string
+	ConversationHistory []ConversationMessage
+}
+
+// ConversationMessage represents a message in the conversation
+type ConversationMessage struct {
+	Role    string
+	Content string
 }
 
 // Manager manages conversation states for all users
@@ -40,4 +47,3 @@ func (m *Manager) Delete(userID int64) {
 	defer m.mu.Unlock()
 	delete(m.states, userID)
 }
-

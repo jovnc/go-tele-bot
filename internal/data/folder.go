@@ -7,6 +7,7 @@ import (
 )
 
 const foldersPath = "data/folders.json"
+const lcSystemPromptPath = "data/lc_system_prompt.md"
 
 type Folder struct {
 	Name string `json:"folder_name"`
@@ -14,8 +15,9 @@ type Folder struct {
 }
 
 var folders []Folder
+var lcSystemPrompt string
 
-// Load data from folders.json file
+// Load data in data/ folder
 func Load() error {
 	data, err := os.ReadFile(foldersPath)
 	if err != nil {
@@ -24,6 +26,13 @@ func Load() error {
 	if err := json.Unmarshal(data, &folders); err != nil {
 		return fmt.Errorf("failed to parse folders.json: %w", err)
 	}
+
+	promptData, err := os.ReadFile(lcSystemPromptPath)
+	if err != nil {
+		return fmt.Errorf("failed to read lc_system_prompt.md: %w", err)
+	}
+	lcSystemPrompt = string(promptData)
+
 	return nil
 }
 
@@ -39,6 +48,11 @@ func GetFolderNames() []string {
 		names[i] = f.Name
 	}
 	return names
+}
+
+// GetLcSystemPrompt returns the LC system prompt
+func GetLcSystemPrompt() string {
+	return lcSystemPrompt
 }
 
 // GetFolderIDsByNames returns the folder IDs with the given names
