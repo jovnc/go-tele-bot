@@ -223,6 +223,12 @@ func ExitLcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	userID := update.Message.From.ID
 	chatID := update.Message.Chat.ID
 
+	// Check if user is in LC mode
+	state := lcState.Get(userID)
+	if state == nil {
+		return
+	}
+
 	// Clear LC mode state
 	lcState.Delete(userID)
 
@@ -230,5 +236,6 @@ func ExitLcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    chatID,
 		Text:      messageLcExit,
+		ParseMode: models.ParseModeHTML,
 	})
 }
