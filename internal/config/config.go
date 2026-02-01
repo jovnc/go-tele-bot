@@ -9,10 +9,11 @@ import (
 )
 
 type Config struct {
-	BotToken   string
-	WebhookURL string
-	Port       string
+	BotToken       string
+	WebhookURL     string
+	Port           string
 	ValidUsernames []string
+	OpenAIAPIKey   string
 }
 
 var GlobalConfig *Config
@@ -33,12 +34,18 @@ func LoadConfig() error {
 
 	port := getEnv("PORT", "8080")
 	validUsernames := strings.Split(getEnv("VALID_USERNAMES", ""), ";")
+	
+	openAIAPIKey := getEnv("OPEN_AI_API_KEY", "")
+	if openAIAPIKey == "" {
+		return fmt.Errorf("OPEN_AI_API_KEY is required")
+	}
 
 	GlobalConfig = &Config{
-		BotToken:   botToken,
-		WebhookURL: webhookURL,
-		Port:       port,
+		BotToken:       botToken,
+		WebhookURL:     webhookURL,
+		Port:           port,
 		ValidUsernames: validUsernames,
+		OpenAIAPIKey:   openAIAPIKey,
 	}
 
 	return nil
