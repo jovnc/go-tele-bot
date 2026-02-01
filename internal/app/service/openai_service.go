@@ -35,10 +35,17 @@ type Message struct {
 }
 
 // StartLCSession initiates a new LC session and returns a random LeetCode problem
-func (s *OpenAIService) StartLCSession(ctx context.Context) (string, []Message, error) {
+func (s *OpenAIService) StartLCSession(ctx context.Context, topic string) (string, []Message, error) {
+	var userMessage string
+	if topic != "" {
+		userMessage = fmt.Sprintf("Give me a LeetCode problem about %s to practice.", topic)
+	} else {
+		userMessage = "Give me a random LeetCode problem to practice."
+	}
+
 	messages := []openai.ChatCompletionMessageParamUnion{
 		openai.SystemMessage(s.systemPrompt),
-		openai.UserMessage("Give me a random LeetCode problem to practice."),
+		openai.UserMessage(userMessage),
 	}
 
 	params := openai.ChatCompletionNewParams{
@@ -60,7 +67,7 @@ func (s *OpenAIService) StartLCSession(ctx context.Context) (string, []Message, 
 	// Initialize conversation history
 	conversationHistory := []Message{
 		{Role: "system", Content: s.systemPrompt},
-		{Role: "user", Content: "Give me a random LeetCode problem to practice."},
+		{Role: "user", Content: userMessage},
 		{Role: "assistant", Content: problem},
 	}
 

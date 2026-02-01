@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 
 	"go-tele-bot/internal/app/service"
 	"go-tele-bot/internal/config"
@@ -58,6 +59,14 @@ func LcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	userID := update.Message.From.ID
 	chatID := update.Message.Chat.ID
 
+	topic := ""
+	if update.Message.Text != "" {
+		text := update.Message.Text
+		if len(text) > 3 { // "/lc" is 3 characters
+			topic = strings.TrimSpace(text[3:])
+		}
+	}
+
 	// Check if user is already in share flow
 	if shareState := getShareState(userID); shareState != nil {
 		b.SendMessage(ctx, &bot.SendMessageParams{
@@ -68,16 +77,21 @@ func LcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	}
 
 	// Send immediate feedback to user
+	statusMsg := "🤖 Generating a LeetCode problem for you..."
+	if topic != "" {
+		statusMsg = fmt.Sprintf("🤖 Generating a LeetCode problem about <b>%s</b> for you...", topic)
+	}
 	_, err := b.SendMessage(ctx, &bot.SendMessageParams{
-		ChatID: chatID,
-		Text:   "🤖 Generating a LeetCode problem for you...",
+		ChatID:    chatID,
+		Text:      statusMsg,
+		ParseMode: models.ParseModeHTML,
 	})
 	if err != nil {
 		log.Printf("Error sending status message: %v", err)
 	}
 
-	// Get random LeetCode problem from OpenAI
-	problem, conversationHistory, err := openAIService.StartLCSession(ctx)
+	// Get LeetCode problem from OpenAI
+	problem, conversationHistory, err := openAIService.StartLCSession(ctx, topic)
 	if err != nil {
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:    chatID,
