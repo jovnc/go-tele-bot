@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/openai/openai-go/v3"
 	"github.com/openai/openai-go/v3/option"
@@ -52,11 +51,6 @@ func (s *OpenAIService) StartLCSession(ctx context.Context, topic string) (strin
 	params := openai.ChatCompletionNewParams{
 		Model:    openai.ChatModelGPT5_2_2025_12_11,
 		Messages: messages,
-		Temperature: openai.Float(0.5),
-		Seed:     openai.Int(time.Now().UnixNano()),
-		Metadata: map[string]string{
-			"request_id": fmt.Sprintf("%d", time.Now().UnixNano()),
-		},
 	}
 
 	response, err := s.client.Chat.Completions.New(ctx, params)
@@ -101,11 +95,6 @@ func (s *OpenAIService) AskQuestion(ctx context.Context, conversationHistory []M
 	params := openai.ChatCompletionNewParams{
 		Model:    openai.ChatModelGPT5_2ChatLatest,
 		Messages: messages,
-		Temperature: openai.Float(0.5),
-		Seed:     openai.Int(time.Now().UnixNano()),
-		Metadata: map[string]string{
-			"request_id": fmt.Sprintf("%d", time.Now().UnixNano()),
-		},
 	}
 
 	response, err := s.client.Chat.Completions.New(ctx, params)
