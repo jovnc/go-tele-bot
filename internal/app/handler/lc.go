@@ -114,7 +114,7 @@ func LcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	// Send the problem to user
 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    chatID,
-		Text:      utils.ConvertMarkdownToTelegramMarkdownV2(problem),
+		Text:      problem,
 		ParseMode: models.ParseModeMarkdown,
 	})
 	if err != nil {
@@ -183,7 +183,7 @@ func LcMessageHandler(ctx context.Context, b *bot.Bot, update *models.Update) bo
 	// Send response to user
 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    chatID,
-		Text:      utils.ConvertMarkdownToTelegramMarkdownV2(answer),
+		Text:      answer,
 		ParseMode: models.ParseModeMarkdown,
 	})
 	if err != nil {
