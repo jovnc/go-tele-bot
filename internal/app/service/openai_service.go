@@ -49,8 +49,9 @@ func (s *OpenAIService) StartLCSession(ctx context.Context, topic string) (strin
 	}
 
 	params := openai.ChatCompletionNewParams{
-		Model:    openai.ChatModelGPT5_2_2025_12_11,
-		Messages: messages,
+		Model:       openai.ChatModelGPT5_2_2025_12_11,
+		Messages:    messages,
+		Temperature: openai.Float(1.0),
 	}
 
 	response, err := s.client.Chat.Completions.New(ctx, params)
@@ -93,8 +94,9 @@ func (s *OpenAIService) AskQuestion(ctx context.Context, conversationHistory []M
 	messages = append(messages, openai.UserMessage(question))
 
 	params := openai.ChatCompletionNewParams{
-		Model:    openai.ChatModelGPT5_2ChatLatest,
-		Messages: messages,
+		Model:       openai.ChatModelGPT5_2ChatLatest,
+		Messages:    messages,
+		Temperature: openai.Float(1.0),
 	}
 
 	response, err := s.client.Chat.Completions.New(ctx, params)

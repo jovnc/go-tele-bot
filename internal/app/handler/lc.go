@@ -115,10 +115,10 @@ func LcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    chatID,
 		Text:      problem,
-		ParseMode: models.ParseModeMarkdown,
+		ParseMode: models.ParseModeHTML,
 	})
 	if err != nil {
-		log.Printf("Error sending problem with Markdown to user %d: %v", userID, err)
+		log.Printf("Error sending problem to user %d: %v", userID, err)
 		_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: chatID,
 			Text:   problem,
@@ -127,7 +127,7 @@ func LcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 			log.Printf("Error sending problem as plain text to user %d: %v", userID, err)
 		}
 	} else {
-		log.Printf("Successfully sent problem with Markdown to user %d", userID)
+		log.Printf("Successfully sent problem to user %d", userID)
 	}
 }
 
@@ -184,10 +184,10 @@ func LcMessageHandler(ctx context.Context, b *bot.Bot, update *models.Update) bo
 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    chatID,
 		Text:      answer,
-		ParseMode: models.ParseModeMarkdown,
+		ParseMode: models.ParseModeHTML,
 	})
 	if err != nil {
-		log.Printf("Error sending answer with Markdown to user %d: %v", userID, err)
+		log.Printf("Error sending answer to user %d: %v", userID, err)
 		_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: chatID,
 			Text:   answer,
@@ -196,7 +196,7 @@ func LcMessageHandler(ctx context.Context, b *bot.Bot, update *models.Update) bo
 			log.Printf("Error sending answer as plain text to user %d: %v", userID, err)
 		}
 	} else {
-		log.Printf("Successfully sent answer with Markdown to user %d", userID)
+		log.Printf("Successfully sent answer to user %d", userID)
 	}
 
 	return true
