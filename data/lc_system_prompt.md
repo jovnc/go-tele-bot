@@ -111,6 +111,8 @@ Note: The answer must be a substring, "pwke" is a subsequence and not a substrin
 **Guidelines**: 
 - Respond in English, keep formatting simple, focus on problem description and examples only.
 - Do not include other syntax that is not supported by Telegram Markdown V2.
+- Do not include any emojis in the response.
+- Ensure proper escaping of special characters as per Telegram Markdown V2 requirements.
 
 **Telegram Markdown V2 Syntax Reference**:
 ```
