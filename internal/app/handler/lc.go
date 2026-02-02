@@ -15,7 +15,6 @@ import (
 	"github.com/go-telegram/bot/models"
 )
 
-// Message text
 const (
 	messageLcError = "⚠️ Something went wrong"
 	messageLcExit = "👋 Exited LC Mode"
@@ -34,7 +33,7 @@ func getShareState(userID int64) *utils.UserState {
 	return GetShareState(userID)
 }
 
-// InitLcHandler initializes the LC handler with OpenAI service
+// InitLcHandler initializes the LC handler with dependencies
 func InitLcHandler() error {
 	sysPrompt := data.GetLcSystemPrompt()
 
@@ -126,8 +125,6 @@ func LcHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 		})
 		if err != nil {
 			log.Printf("Error sending problem as plain text to user %d: %v", userID, err)
-		} else {
-			log.Printf("Successfully sent problem as plain text to user %d", userID)
 		}
 	} else {
 		log.Printf("Successfully sent problem with Markdown to user %d", userID)
@@ -197,8 +194,6 @@ func LcMessageHandler(ctx context.Context, b *bot.Bot, update *models.Update) bo
 		})
 		if err != nil {
 			log.Printf("Error sending answer as plain text to user %d: %v", userID, err)
-		} else {
-			log.Printf("Successfully sent answer as plain text to user %d", userID)
 		}
 	} else {
 		log.Printf("Successfully sent answer with Markdown to user %d", userID)

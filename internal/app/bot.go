@@ -33,8 +33,11 @@ func NewTelegramBot(botToken string) (*TelegramBot, error) {
 	}, nil
 }
 
-// Start bot using long polling
-func (b *TelegramBot) Start(ctx context.Context) error {
+/**
+ * Star bot using long polling
+ * Useful for development and testing purposes
+ */
+func (b *TelegramBot) StartPolling(ctx context.Context) error {
 	// Delete webhook before starting polling
 	_, err := b.bot.DeleteWebhook(ctx, &bot.DeleteWebhookParams{
 		DropPendingUpdates: true,
@@ -48,7 +51,10 @@ func (b *TelegramBot) Start(ctx context.Context) error {
 	return nil
 }
 
-// Start bot using webhook (preferred)
+/**
+ * Start bot using webhook (for production)
+ * Useful for serverless environments to reduce resource usage
+ */
 func (b *TelegramBot) StartWebhook(ctx context.Context) error {
 	_, err := b.bot.SetWebhook(ctx, &bot.SetWebhookParams{
 		URL: config.GlobalConfig.WebhookURL,

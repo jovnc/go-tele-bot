@@ -27,9 +27,9 @@ func main() {
 		log.Fatalf("Failed to load data: %v", err)
 	}
 
-	// Initialize handlers
-	if err := handler.InitLcHandler(); err != nil {
-		log.Fatalf("Failed to initialize LC handler: %v", err)
+	// Intialise telegram bot handlers
+	if err := handler.InitialiseHandlers(); err != nil {
+		log.Fatalf("Failed to initialize handlers: %v", err)
 	}
 
 	// Start the bot
@@ -48,7 +48,7 @@ func main() {
 		}
 	} else {
 		log.Println("Starting bot in polling mode (local dev)...")
-		err = bot.Start(ctx)
+		err = bot.StartPolling(ctx)
 		if err != nil {
 			log.Fatalf("Failed to start polling: %v", err)
 		}

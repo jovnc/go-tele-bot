@@ -27,6 +27,14 @@ func DefaultHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	})(ctx, b, update)
 }
 
+// InitialiseHandlers initializes all handlers
+func InitialiseHandlers() error {
+	if err := InitLcHandler(); err != nil {
+		return err
+	}
+	return nil
+}
+
 // RegisterHandlers registers all bot handlers
 func RegisterHandlers(b *bot.Bot) {
 	b.RegisterHandler(bot.HandlerTypeMessageText, "share", bot.MatchTypeCommand, middleware.WithAuth(ShareCommandHandler))
