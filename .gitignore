@@ -2,3 +2,10 @@
 data/folders.json
 credentials.json
 build/
+
+# Terraform
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/terraform.tfvars
+terraform/.terraform.lock.hcl
