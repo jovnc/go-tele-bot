@@ -3,8 +3,6 @@
 # Deploy script for go-tele-bot
 # Prerequisites: Secrets and IAM are managed via Terraform (./terraform)
 
-set -e
-
 # Check that gcloud is installed
 if ! command -v gcloud &> /dev/null; then
     echo "Error: gcloud could not be found"
